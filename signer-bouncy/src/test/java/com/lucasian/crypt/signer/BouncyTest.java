@@ -16,14 +16,14 @@ import org.junit.Test;
 
 public class BouncyTest {
 
-	private String theKey = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3.cer";
-	//private String theKey = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/sasj640127pw7.cer";
+	private String theCert = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3.cer";
+	//private String theCert = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/sasj640127pw7.cer";
 	
 	@Test
 	public void testGetData() throws Exception {
 		Security.addProvider(new BouncyCastleProvider());
 
-		InputStream is = new FileInputStream(theKey);
+		InputStream is = new FileInputStream(theCert);
 		CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
 
 		X509Certificate cert = (X509Certificate) cf.generateCertificate(is);
@@ -50,6 +50,11 @@ public class BouncyTest {
 
 		System.out.println(results);
 
+	}
+	
+	@Test
+	public void signKey() {
+		
 	}
 
 }
