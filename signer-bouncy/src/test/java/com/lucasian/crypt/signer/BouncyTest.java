@@ -34,12 +34,8 @@ import org.junit.Test;
 
 public class BouncyTest {
 
-	// private String theCert =
-	// "/data/workspaces/just-cloud/signer/signer-bouncy/certs/rahd8211267c9.cer";
-	private String theCert = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3.cer";
-	// private String theKey =
-	// "/data/workspaces/just-cloud/signer/signer-bouncy/certs/rahd8211267c9_1202230852.key";
-	private String theKey = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3_0911191019.key";
+	private String theCert = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/xxxx.cer";
+	private String theKey = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/xxx.key";
 	private String thePassword = "xxxx";
 
 	@BeforeClass
