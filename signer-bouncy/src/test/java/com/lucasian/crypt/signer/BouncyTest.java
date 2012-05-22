@@ -17,9 +17,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.ssl.PKCS8Key;
+import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.EncryptionScheme;
+import org.bouncycastle.asn1.pkcs.PBES2Parameters;
+import org.bouncycastle.asn1.pkcs.PBKDF2Params;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.RC2CBCParameter;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.PBEParametersGenerator;
+import org.bouncycastle.crypto.engines.DESedeEngine;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
@@ -34,9 +53,9 @@ import org.junit.Test;
 
 public class BouncyTest {
 
-	private String theCert = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/xxxx.cer";
-	private String theKey = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/xxx.key";
-	private String thePassword = "xxxx";
+	private String theCert = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3.cer";
+	private String theKey = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3_0911191019.key";
+	private String thePassword = "david0211";
 
 	@BeforeClass
 	public static void preload() {
@@ -64,29 +83,19 @@ public class BouncyTest {
 			results.put(oids.get(i).getId(), value.get(i));
 		}
 
-		System.out.println(results);
+		// System.out.println(results);
 
 		// cert.checkValidity();
 
 	}
 
 	@Test
-	public void signKey() throws Exception {
-		PKCS8Key key = new PKCS8Key(readBytes(new File(theKey)),
-				thePassword.toCharArray());
-		PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(
-				key.getDecryptedBytes());
-		String alg = null;
+	public void testOtherKey() throws Exception {
 
-		if (key.isDSA()) {
-			alg = "DSA";
-		} else if (key.isRSA()) {
-			alg = "RSA";
-		} else {
-			throw new Exception("Unknown algorithm");
-		}
+		
 
-		PrivateKey pk = KeyFactory.getInstance(alg, "BC").generatePrivate(spec);
+		PrivateKey pk = buildPrivateKey(new File(theKey), thePassword);
+
 		X509Certificate cert = readCert();
 		PublicKey puk = cert.getPublicKey();
 		AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder()
@@ -99,8 +108,8 @@ public class BouncyTest {
 
 		signer.getOutputStream().write(signString.getBytes());
 		String signedString = new String(Hex.encode(signer.getSignature()));
-		System.out.printf("The signature of %s is %s\n", signString,
-				signedString);
+		// System.out.printf("The signature of %s is %s\n", signString,
+		// signedString);
 
 		ContentVerifierProvider verifierProvider = new JcaContentVerifierProviderBuilder()
 				.setProvider("BC").build(puk);
@@ -108,6 +117,72 @@ public class BouncyTest {
 		ContentVerifier verifier = verifierProvider.get(sigAlgId);
 		verifier.getOutputStream().write(signString.getBytes());
 		assertTrue(verifier.verify(Hex.decode(signedString.getBytes())));
+	}
+
+	private PrivateKey buildPrivateKey(File file, String password)
+			throws Exception {
+		BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(
+				new CBCBlockCipher(new DESedeEngine()));
+		int keySize = 192;
+
+		ASN1InputStream asn1 = new ASN1InputStream(readBytes(file));
+		DERObject der = asn1.readObject();
+		DERSequence sequence = (DERSequence) der;
+
+		// System.out.println(sequence);
+
+		PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
+
+		EncryptedPrivateKeyInfo info = new EncryptedPrivateKeyInfo(sequence);
+
+		PBES2Parameters alg = new PBES2Parameters((ASN1Sequence) info
+				.getEncryptionAlgorithm().getParameters());
+		PBKDF2Params func = (PBKDF2Params) alg.getKeyDerivationFunc()
+				.getParameters();
+		EncryptionScheme scheme = alg.getEncryptionScheme();
+
+		if (func.getKeyLength() != null) {
+			keySize = func.getKeyLength().intValue() * 8;
+		}
+
+		int iterationCount = func.getIterationCount().intValue();
+		byte[] salt = func.getSalt();
+
+		generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(thePassword
+				.toCharArray()), salt, iterationCount);
+
+		CipherParameters param;
+
+		if (scheme.getAlgorithm().equals(PKCSObjectIdentifiers.RC2_CBC)) {
+			RC2CBCParameter rc2Params = new RC2CBCParameter(
+					(ASN1Sequence) scheme.getObject());
+			byte[] iv = rc2Params.getIV();
+
+			param = new ParametersWithIV(
+					generator.generateDerivedParameters(keySize), iv);
+		} else {
+			byte[] iv = ((ASN1OctetString) scheme.getObject()).getOctets();
+
+			param = new ParametersWithIV(
+					generator.generateDerivedParameters(keySize), iv);
+		}
+
+		cipher.init(false, param);
+
+		byte[] data = info.getEncryptedData();
+		byte[] out = new byte[cipher.getOutputSize(data.length)];
+		int len = cipher.processBytes(data, 0, data.length, out, 0);
+
+		len += cipher.doFinal(out, len);
+
+		ASN1InputStream asn1Out = new ASN1InputStream(out);
+
+		PrivateKeyInfo keyInfo = new PrivateKeyInfo(
+				(ASN1Sequence) asn1Out.readObject());
+
+		return KeyFactory.getInstance(
+				keyInfo.getAlgorithmId().getAlgorithm().getId(), "BC")
+				.generatePrivate(new PKCS8EncodedKeySpec(keyInfo.getEncoded()));
 	}
 
 	private byte[] readBytes(File file) throws Exception {
@@ -154,7 +229,7 @@ public class BouncyTest {
 					"BC");
 			cert = (X509Certificate) cf.generateCertificate(is);
 
-			System.out.println(cert);
+			// System.out.println(cert);
 
 		} finally {
 			if (is != null) {
