@@ -1,4 +1,4 @@
-package com.lucasian.crypt.signer;
+package com.lucasian.crypt.signer.test;
 
 import static org.junit.Assert.assertTrue;
 
@@ -51,11 +51,16 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.lucasian.crypt.signer.BouncySigner;
+import com.lucasian.crypt.signer.api.Signer;
+
+
 public class BouncyTest {
 
-	private String theCert = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3.cer";
-	private String theKey = "/data/workspaces/just-cloud/signer/signer-bouncy/certs/paae780711fr3_0911191019.key";
-	private String thePassword = "david0211";
+	private String theCert = "/home/herrfantastic/Downloads/SSAU/soma770305e38.cer";
+	private String theKey = "/home/herrfantastic/Downloads/SSAU/SOMA770305E38_1110120927.key";
+	//private String thePassword = "sau12345";
+	private String thePassword = "S1SqbxD1n3";
 
 	@BeforeClass
 	public static void preload() {
@@ -63,6 +68,28 @@ public class BouncyTest {
 		Security.addProvider(provider);
 	}
 
+	@Test
+	public void testGetDataOther() throws Exception{
+		Signer signer = new BouncySigner();		
+		Map<String , String> mapa = new HashMap<String, String>();
+		mapa = signer.getCertData(new FileInputStream(new File(theCert)));
+		System.out.println("MAPA[" + mapa + "]");		
+		signer.validate(new FileInputStream(new File(theCert)));
+	}
+	
+	@Test
+	public void testSignString() throws Exception{
+		Signer signer = new BouncySigner();		
+		String signedString = signer.sign(
+				"Anita lava la tina", 
+				new FileInputStream(new File(theCert)),
+				new FileInputStream(new File(theKey)),
+				thePassword
+				);
+		System.out.println("SIGNED STRING[" + signedString + "]");		
+		signer.validate(new FileInputStream(new File(theCert)));
+	}
+		
 	@Test
 	public void testGetData() throws Exception {
 		X509Certificate cert = readCert();
@@ -76,24 +103,44 @@ public class BouncyTest {
 		@SuppressWarnings("unchecked")
 		Vector<String> value = principal.getValues();
 
-		for (int i = 0; i < oids.size(); i++) {
+		int index = 0;
+		
+		ASN1ObjectIdentifier name = new ASN1ObjectIdentifier("2.5.4.41");
+		ASN1ObjectIdentifier curp = new ASN1ObjectIdentifier("2.5.4.5");
+		ASN1ObjectIdentifier rfc = new ASN1ObjectIdentifier("2.5.4.45");
+				
+		if(oids.contains(name)){
+			index = oids.indexOf(name);
+			results.put("name", value.get(index));
+		}
+		
+		if(oids.contains(curp)){
+			index = oids.indexOf(curp);
+			results.put("curp", value.get(index));
+		}
+		
+		if(oids.contains(rfc)){
+			index = oids.indexOf(rfc);
+			results.put("rfc", value.get(index));
+		}
+
+		//for (int i = 0; i < oids.size(); i++) {
 			// 2.5.4.41 is the name
 			// 2.5.4.5 is the CURP
 			// 2.5.4.45 is the RFC
-			results.put(oids.get(i).getId(), value.get(i));
-		}
+			//results.put(oids.get(i).getId(), value.get(i));
+			//results.put(oids.get(""), value.get(value))
+		//}
 
-		// System.out.println(results);
-
-		// cert.checkValidity();
+		System.out.println("OIDS[" + oids + "]");
+		System.out.println("VALUES[" + value + "]");
+		System.out.println("RESULTS[" + results + "]");
+		cert.checkValidity();
 
 	}
 
 	@Test
 	public void testOtherKey() throws Exception {
-
-		
-
 		PrivateKey pk = buildPrivateKey(new File(theKey), thePassword);
 
 		X509Certificate cert = readCert();
@@ -116,6 +163,8 @@ public class BouncyTest {
 
 		ContentVerifier verifier = verifierProvider.get(sigAlgId);
 		verifier.getOutputStream().write(signString.getBytes());
+		
+		
 		assertTrue(verifier.verify(Hex.decode(signedString.getBytes())));
 	}
 
