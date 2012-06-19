@@ -51,6 +51,10 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.lucasian.crypt.signer.BouncySigner;
+import com.lucasian.crypt.signer.api.Signer;
+
+
 public class BouncyTest {
 
 	private String theCert = "/home/herrfantastic/Downloads/SSAU/soma770305e38.cer";
@@ -64,6 +68,28 @@ public class BouncyTest {
 		Security.addProvider(provider);
 	}
 
+	@Test
+	public void testGetDataOther() throws Exception{
+		Signer signer = new BouncySigner();		
+		Map<String , String> mapa = new HashMap<String, String>();
+		mapa = signer.getCertData(new FileInputStream(new File(theCert)));
+		System.out.println("MAPA[" + mapa + "]");		
+		signer.validate(new FileInputStream(new File(theCert)));
+	}
+	
+	@Test
+	public void testSignString() throws Exception{
+		Signer signer = new BouncySigner();		
+		String signedString = signer.sign(
+				"Anita lava la tina", 
+				new FileInputStream(new File(theCert)),
+				new FileInputStream(new File(theKey)),
+				thePassword
+				);
+		System.out.println("SIGNED STRING[" + signedString + "]");		
+		signer.validate(new FileInputStream(new File(theCert)));
+	}
+		
 	@Test
 	public void testGetData() throws Exception {
 		X509Certificate cert = readCert();
