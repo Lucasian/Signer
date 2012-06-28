@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.lucasian.crypt</groupId>
 	<artifactId>signer</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>Signer</name>
 	<description>Sign Encription</description>
 	<packaging>pom</packaging>
