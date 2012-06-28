@@ -1,4 +1,4 @@
-package com.lucasian.crypt.signer;
+package com.lucasian.crypt.signer.bouncy;
 
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.util.encoders.Hex;
 
-import com.lucasian.crypt.signer.api.Signer;
+import com.lucasian.crypt.signer.Signer;
 
 import org.apache.commons.io.IOUtils;
 

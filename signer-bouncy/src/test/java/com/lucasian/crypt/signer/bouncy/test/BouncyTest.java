@@ -1,4 +1,4 @@
-package com.lucasian.crypt.signer.test;
+package com.lucasian.crypt.signer.bouncy.test;
 
 import static org.junit.Assert.assertTrue;
 
@@ -51,8 +51,8 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.lucasian.crypt.signer.BouncySigner;
-import com.lucasian.crypt.signer.api.Signer;
+import com.lucasian.crypt.signer.Signer;
+import com.lucasian.crypt.signer.bouncy.BouncySigner;
 
 
 public class BouncyTest {

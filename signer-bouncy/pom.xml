@@ -4,11 +4,12 @@
 	<parent>
 		<artifactId>signer</artifactId>
 		<groupId>com.lucasian.crypt</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.1</version>
 	</parent>
 	<artifactId>signer-bouncy</artifactId>
 	<name>Signer Bouncy</name>
 	<description>Lucasians's Signer Bouncy Castle implementation</description>
+        <packaging>bundle</packaging>
 
 	<dependencies>
 		<dependency>
@@ -58,6 +59,7 @@
 				<configuration>
 					<instructions>
 						<Import-Package>*</Import-Package>
+						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

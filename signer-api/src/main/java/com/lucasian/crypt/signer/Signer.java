@@ -1,4 +1,4 @@
-package com.lucasian.crypt.signer.api;
+package com.lucasian.crypt.signer;
 
 import java.io.IOException;
 import java.io.InputStream;
