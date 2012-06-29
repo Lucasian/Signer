@@ -4,10 +4,11 @@
 	<parent>
 		<artifactId>signer</artifactId>
 		<groupId>com.lucasian.crypt</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.1</version>
 	</parent>
 	<artifactId>signer-api</artifactId>
 	<name>Signer Api</name>
+        <packaging>bundle</packaging>
 	<description>Lucasian Signer API</description>
 
 	<build>
