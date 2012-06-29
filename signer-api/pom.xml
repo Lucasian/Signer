@@ -20,9 +20,8 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>
-							*
-						</Export-Package>
+						<Import-Package></Import-Package>
+						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
