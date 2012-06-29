@@ -1,4 +1,4 @@
-package com.lucasian.crypt.signer.test;
+package com.lucasian.crypt.signer.bouncy.test;
 
 import static org.junit.Assert.assertTrue;
 
@@ -51,15 +51,14 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.lucasian.crypt.signer.BouncySigner;
-import com.lucasian.crypt.signer.api.Signer;
+import com.lucasian.crypt.signer.Signer;
+import com.lucasian.crypt.signer.bouncy.BouncySigner;
 
 
 public class BouncyTest {
 
 	private String theCert = "/home/herrfantastic/Downloads/SSAU/soma770305e38.cer";
 	private String theKey = "/home/herrfantastic/Downloads/SSAU/SOMA770305E38_1110120927.key";
-	//private String thePassword = "sau12345";
 	private String thePassword = "S1SqbxD1n3";
 
 	@BeforeClass
@@ -74,7 +73,7 @@ public class BouncyTest {
 		Map<String , String> mapa = new HashMap<String, String>();
 		mapa = signer.getCertData(new FileInputStream(new File(theCert)));
 		System.out.println("MAPA[" + mapa + "]");		
-		signer.validate(new FileInputStream(new File(theCert)));
+		signer.verifyCert(new FileInputStream(new File(theCert)));
 	}
 	
 	@Test
@@ -87,7 +86,13 @@ public class BouncyTest {
 				thePassword
 				);
 		System.out.println("SIGNED STRING[" + signedString + "]");		
-		signer.validate(new FileInputStream(new File(theCert)));
+		System.out.println("VALIDANDO[" + signer.validate(
+				new FileInputStream(	
+				new File(theCert)), "Anita lava la tina", signedString) + "]");
+		
+		assertTrue(signer.validate(
+				new FileInputStream(	
+				new File(theCert)), "Anita lava la tina", signedString));
 	}
 		
 	@Test
@@ -151,21 +156,18 @@ public class BouncyTest {
 		ContentSigner signer = new JcaContentSignerBuilder("SHA1withRSA")
 				.setProvider("BC").build(pk);
 
-		String signString = "Vamos a firmar";
+		String signString = "Anita lava la tina";
 
 		signer.getOutputStream().write(signString.getBytes());
 		String signedString = new String(Hex.encode(signer.getSignature()));
-		// System.out.printf("The signature of %s is %s\n", signString,
-		// signedString);
+		//System.out.printf("The signature of %s is %s\n", signString,
+		//signedString);
 
 		ContentVerifierProvider verifierProvider = new JcaContentVerifierProviderBuilder()
 				.setProvider("BC").build(puk);
 
 		ContentVerifier verifier = verifierProvider.get(sigAlgId);
 		verifier.getOutputStream().write(signString.getBytes());
-		
-		
-		assertTrue(verifier.verify(Hex.decode(signedString.getBytes())));
 	}
 
 	private PrivateKey buildPrivateKey(File file, String password)
