@@ -111,6 +111,7 @@ public class BouncySigner implements Signer{
 		for (int i = 0; i < oids.size(); i++) {
 			results.put(oids.get(i).getId(), value.get(i));
 		}
+		results.put("serialNumber", cert.getSerialNumber().toString());
 
 		return results;
 	}

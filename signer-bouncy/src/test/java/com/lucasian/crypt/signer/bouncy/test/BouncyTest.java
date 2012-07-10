@@ -57,8 +57,8 @@ import com.lucasian.crypt.signer.bouncy.BouncySigner;
 
 public class BouncyTest {
 
-	private String theCert = "/home/herrfantastic/Downloads/SSAU/soma770305e38.cer";
-	private String theKey = "/home/herrfantastic/Downloads/SSAU/SOMA770305E38_1110120927.key";
+	private String theCert = "/home/gerardo/Documents/mua/Certificados/soma770305e38.cer";
+	private String theKey = "/home/gerardo/Documents/mua/Certificados/SOMA770305E38_1110120927.key";
 	private String thePassword = "S1SqbxD1n3";
 
 	@BeforeClass
@@ -72,7 +72,8 @@ public class BouncyTest {
 		Signer signer = new BouncySigner();		
 		Map<String , String> mapa = new HashMap<String, String>();
 		mapa = signer.getCertData(new FileInputStream(new File(theCert)));
-		System.out.println("MAPA[" + mapa + "]");		
+		System.out.println("MAPA[" + mapa + "]");	
+		System.out.println("Serial NUmber length: " + mapa.get("serialNumber").toString().length());
 		signer.verifyCert(new FileInputStream(new File(theCert)));
 	}
 	
