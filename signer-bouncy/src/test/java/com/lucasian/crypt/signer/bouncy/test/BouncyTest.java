@@ -58,9 +58,9 @@ import com.lucasian.crypt.signer.bouncy.BouncySigner;
 
 public class BouncyTest {
 
-	private String theCert = "/home/gerardo/Documents/mua/Certificados/soma770305e38.cer";
-	private String theKey = "/home/gerardo/Documents/mua/Certificados/SOMA770305E38_1110120927.key";
-	private String thePassword = "S1SqbxD1n3";
+	private String theCert = "";
+	private String theKey = "";
+	private String thePassword = "";
 
 	@BeforeClass
 	public static void preload() {
