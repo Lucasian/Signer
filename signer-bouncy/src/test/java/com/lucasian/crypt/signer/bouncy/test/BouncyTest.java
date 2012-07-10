@@ -58,9 +58,9 @@ import com.lucasian.crypt.signer.bouncy.BouncySigner;
 
 public class BouncyTest {
 
-	private String theCert = "";
-	private String theKey = "";
-	private String thePassword = "";
+	private String theCert = "/home/gerardo/Documents/mua/Certificados/soma770305e38.cer";
+	private String theKey = "/home/gerardo/Documents/mua/Certificados/SOMA770305E38_1110120927.key";
+	private String thePassword = "S1SqbxD1n3";
 
 	@BeforeClass
 	public static void preload() {
@@ -76,7 +76,8 @@ public class BouncyTest {
 		certData = signer.getCertData(new FileInputStream(new File(theCert)));
 		mapa = certData.getPersonData();
 		System.out.println("MAPA[" + mapa + "]");	
-		System.out.println("Serial NUmber length: " + mapa.get("serialNumber").toString().length());
+		System.out.println("Serial NUmber length: " + certData.getSerialNumber().length());
+		System.out.println("Expiration Date:" + certData.getExpirationDate().toGMTString());
 		signer.verifyCert(new FileInputStream(new File(theCert)));
 	}
 	

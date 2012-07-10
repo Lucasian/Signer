@@ -98,12 +98,12 @@ public class BouncySigner implements Signer{
 	public CertData getCertData(InputStream certStream)
 			throws IOException, Exception {
 		CertData certData = new CertData();
-		Map<String, String> userData = null;
+		Map<String, String> personData = null;
 
 		X509Certificate cert = readCert(certStream);
 		X509Principal principal = (X509Principal) cert.getSubjectDN();
 
-		userData = new HashMap<String, String>();
+		personData = new HashMap<String, String>();
 
 		@SuppressWarnings({ "unchecked", "deprecation" })
 		Vector<ASN1ObjectIdentifier> oids = principal.getOIDs();
@@ -111,8 +111,9 @@ public class BouncySigner implements Signer{
 		Vector<String> value = principal.getValues();
 
 		for (int i = 0; i < oids.size(); i++) {
-			userData.put(oids.get(i).getId(), value.get(i));
+			personData.put(oids.get(i).getId(), value.get(i));
 		}
+		certData.setPersonData(personData);
 		certData.setSerialNumber(cert.getSerialNumber().toString());
 		certData.setExpirationDate(cert.getNotAfter());
 		
