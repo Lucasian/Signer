@@ -51,6 +51,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.lucasian.crypt.signer.CertData;
 import com.lucasian.crypt.signer.Signer;
 import com.lucasian.crypt.signer.bouncy.BouncySigner;
 
@@ -70,8 +71,10 @@ public class BouncyTest {
 	@Test
 	public void testGetDataOther() throws Exception{
 		Signer signer = new BouncySigner();		
+		CertData certData = new CertData();
 		Map<String , String> mapa = new HashMap<String, String>();
-		mapa = signer.getCertData(new FileInputStream(new File(theCert)));
+		certData = signer.getCertData(new FileInputStream(new File(theCert)));
+		mapa = certData.getPersonData();
 		System.out.println("MAPA[" + mapa + "]");	
 		System.out.println("Serial NUmber length: " + mapa.get("serialNumber").toString().length());
 		signer.verifyCert(new FileInputStream(new File(theCert)));

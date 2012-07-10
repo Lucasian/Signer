@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
-import java.util.Map;
 
 public interface Signer {
 
@@ -17,7 +16,7 @@ public interface Signer {
 	public boolean validate(InputStream certStream, String signString, String signedString) throws 
 	CertificateNotYetValidException, CertificateExpiredException, Exception;
 	
-	public Map<String, String> getCertData(InputStream certStream) 
+	public CertData getCertData(InputStream certStream) 
 			throws IOException, Exception;
 	
 }
