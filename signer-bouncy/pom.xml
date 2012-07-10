@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>signer</artifactId>
 		<groupId>com.lucasian.crypt</groupId>
-		<version>0.0.2</version>
+		<version>0.0.1</version>
 	</parent>
 	<artifactId>signer-bouncy</artifactId>
 	<name>Signer Bouncy</name>

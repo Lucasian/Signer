@@ -46,6 +46,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.util.encoders.Hex;
 
+import com.lucasian.crypt.signer.CertData;
 import com.lucasian.crypt.signer.Signer;
 
 import org.apache.commons.io.IOUtils;
@@ -94,14 +95,15 @@ public class BouncySigner implements Signer{
 	}
 	
 	@Override
-	public Map<String, String> getCertData(InputStream certStream)
+	public CertData getCertData(InputStream certStream)
 			throws IOException, Exception {
-		Map<String, String> results = null;
+		CertData certData = new CertData();
+		Map<String, String> userData = null;
 
 		X509Certificate cert = readCert(certStream);
 		X509Principal principal = (X509Principal) cert.getSubjectDN();
 
-		results = new HashMap<String, String>();
+		userData = new HashMap<String, String>();
 
 		@SuppressWarnings({ "unchecked", "deprecation" })
 		Vector<ASN1ObjectIdentifier> oids = principal.getOIDs();
@@ -109,11 +111,12 @@ public class BouncySigner implements Signer{
 		Vector<String> value = principal.getValues();
 
 		for (int i = 0; i < oids.size(); i++) {
-			results.put(oids.get(i).getId(), value.get(i));
+			userData.put(oids.get(i).getId(), value.get(i));
 		}
-		results.put("serialNumber", cert.getSerialNumber().toString());
-
-		return results;
+		certData.setSerialNumber(cert.getSerialNumber().toString());
+		certData.setExpirationDate(cert.getNotAfter());
+		
+		return certData;
 	}
 	
 	private X509Certificate readCert(InputStream is) throws Exception {
