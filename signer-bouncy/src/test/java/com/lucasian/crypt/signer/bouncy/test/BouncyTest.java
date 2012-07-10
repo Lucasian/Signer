@@ -76,7 +76,8 @@ public class BouncyTest {
 		certData = signer.getCertData(new FileInputStream(new File(theCert)));
 		mapa = certData.getPersonData();
 		System.out.println("MAPA[" + mapa + "]");	
-		System.out.println("Serial NUmber length: " + mapa.get("serialNumber").toString().length());
+		System.out.println("Serial NUmber length: " + certData.getSerialNumber().length());
+		System.out.println("Expiration Date:" + certData.getExpirationDate().toGMTString());
 		signer.verifyCert(new FileInputStream(new File(theCert)));
 	}
 	
