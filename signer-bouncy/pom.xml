@@ -13,6 +13,12 @@
 
 	<dependencies>
 		<dependency>
+		    <groupId>org.osgi</groupId>
+		    <artifactId>org.osgi.core</artifactId>
+		    <version>4.3.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.lucasian.crypt</groupId>
 			<artifactId>signer-api</artifactId>
 			<version>${project.version}</version>
@@ -58,6 +64,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<Bundle-Activator>com.lucasian.crypt.signer.bouncy.BouncyActivator</Bundle-Activator>
 						<Import-Package>*</Import-Package>
 						<Export-Package></Export-Package>
 					</instructions>
