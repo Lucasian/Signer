@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.ssl.PKCS8Key;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -55,12 +56,14 @@ import com.lucasian.crypt.signer.CertData;
 import com.lucasian.crypt.signer.Signer;
 import com.lucasian.crypt.signer.bouncy.BouncySigner;
 
+import sun.security.pkcs.*;
+
 
 public class BouncyTest {
 
-	private String theCert = "";
-	private String theKey = "";
-	private String thePassword = "";
+	private String theCert = "/home/iamedu/hola/output.crt";
+	private String theKey = "/home/iamedu/hola/output.key";
+	private String thePassword = "ñoño";
 
 	@BeforeClass
 	public static void preload() {
@@ -177,68 +180,8 @@ public class BouncyTest {
 
 	private PrivateKey buildPrivateKey(File file, String password)
 			throws Exception {
-		BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(
-				new CBCBlockCipher(new DESedeEngine()));
-		int keySize = 192;
-
-		ASN1InputStream asn1 = new ASN1InputStream(readBytes(file));
-		DERObject der = asn1.readObject();
-		DERSequence sequence = (DERSequence) der;
-
-		// System.out.println(sequence);
-
-		PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
-
-		EncryptedPrivateKeyInfo info = new EncryptedPrivateKeyInfo(sequence);
-
-		PBES2Parameters alg = new PBES2Parameters((ASN1Sequence) info
-				.getEncryptionAlgorithm().getParameters());
-		PBKDF2Params func = (PBKDF2Params) alg.getKeyDerivationFunc()
-				.getParameters();
-		EncryptionScheme scheme = alg.getEncryptionScheme();
-
-		if (func.getKeyLength() != null) {
-			keySize = func.getKeyLength().intValue() * 8;
-		}
-
-		int iterationCount = func.getIterationCount().intValue();
-		byte[] salt = func.getSalt();
-
-		generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(thePassword
-				.toCharArray()), salt, iterationCount);
-
-		CipherParameters param;
-
-		if (scheme.getAlgorithm().equals(PKCSObjectIdentifiers.RC2_CBC)) {
-			RC2CBCParameter rc2Params = new RC2CBCParameter(
-					(ASN1Sequence) scheme.getObject());
-			byte[] iv = rc2Params.getIV();
-
-			param = new ParametersWithIV(
-					generator.generateDerivedParameters(keySize), iv);
-		} else {
-			byte[] iv = ((ASN1OctetString) scheme.getObject()).getOctets();
-
-			param = new ParametersWithIV(
-					generator.generateDerivedParameters(keySize), iv);
-		}
-
-		cipher.init(false, param);
-
-		byte[] data = info.getEncryptedData();
-		byte[] out = new byte[cipher.getOutputSize(data.length)];
-		int len = cipher.processBytes(data, 0, data.length, out, 0);
-
-		len += cipher.doFinal(out, len);
-
-		ASN1InputStream asn1Out = new ASN1InputStream(out);
-
-		PrivateKeyInfo keyInfo = new PrivateKeyInfo(
-				(ASN1Sequence) asn1Out.readObject());
-
-		return KeyFactory.getInstance(
-				keyInfo.getAlgorithmId().getAlgorithm().getId(), "BC")
-				.generatePrivate(new PKCS8EncodedKeySpec(keyInfo.getEncoded()));
+		PKCS8Key key = new PKCS8Key(new FileInputStream(file), password.toCharArray());
+		return key.getPrivateKey();
 	}
 
 	private byte[] readBytes(File file) throws Exception {

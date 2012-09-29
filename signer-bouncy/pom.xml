@@ -9,13 +9,13 @@
 	<artifactId>signer-bouncy</artifactId>
 	<name>Signer Bouncy</name>
 	<description>Lucasians's Signer Bouncy Castle implementation</description>
-        <packaging>bundle</packaging>
+	<packaging>bundle</packaging>
 
 	<dependencies>
 		<dependency>
-		    <groupId>org.osgi</groupId>
-		    <artifactId>org.osgi.core</artifactId>
-		    <version>4.3.0</version>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.3.0</version>
 		</dependency>
 
 		<dependency>
@@ -50,9 +50,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.servicemix.bundles</groupId>
-    		<artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
-    		<version>1.4_3</version>
-    	</dependency>
+			<artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
+			<version>1.4_3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.not-yet-commons-ssl</artifactId>
+			<version>0.3.11_1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

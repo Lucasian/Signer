@@ -3,7 +3,9 @@ package com.lucasian.crypt.signer.bouncy;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.KeyFactory;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
@@ -20,6 +22,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
 import org.bouncycastle.asn1.pkcs.EncryptionScheme;
@@ -38,6 +41,8 @@ import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PasswordFinder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
@@ -50,6 +55,8 @@ import com.lucasian.crypt.signer.CertData;
 import com.lucasian.crypt.signer.Signer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.ssl.PKCS8Key;
 
 public class BouncySigner implements Signer{
 
@@ -134,69 +141,9 @@ public class BouncySigner implements Signer{
 		return cert;
 	}
 	
-	private PrivateKey buildPrivateKey(InputStream keyStream, String password) throws Exception {
-		BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(
-				new CBCBlockCipher(new DESedeEngine()));
-		int keySize = 192;
-
-		ASN1InputStream asn1 = new ASN1InputStream(
-				IOUtils.toByteArray(keyStream)
-				);
-		DERObject der = asn1.readObject();
-		DERSequence sequence = (DERSequence) der;
-
-		PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
-
-		EncryptedPrivateKeyInfo info = new EncryptedPrivateKeyInfo(sequence);
-
-		PBES2Parameters alg = new PBES2Parameters((ASN1Sequence) info
-				.getEncryptionAlgorithm().getParameters());
-		PBKDF2Params func = (PBKDF2Params) alg.getKeyDerivationFunc()
-				.getParameters();
-		EncryptionScheme scheme = alg.getEncryptionScheme();
-
-		if (func.getKeyLength() != null) {
-			keySize = func.getKeyLength().intValue() * 8;
-		}
-
-		int iterationCount = func.getIterationCount().intValue();
-		byte[] salt = func.getSalt();
-
-		generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(password
-				.toCharArray()), salt, iterationCount);
-
-		CipherParameters param;
-
-		if (scheme.getAlgorithm().equals(PKCSObjectIdentifiers.RC2_CBC)) {
-			RC2CBCParameter rc2Params = new RC2CBCParameter(
-					(ASN1Sequence) scheme.getObject());
-			byte[] iv = rc2Params.getIV();
-
-			param = new ParametersWithIV(
-					generator.generateDerivedParameters(keySize), iv);
-		} else {
-			byte[] iv = ((ASN1OctetString) scheme.getObject()).getOctets();
-
-			param = new ParametersWithIV(
-					generator.generateDerivedParameters(keySize), iv);
-		}
-
-		cipher.init(false, param);
-
-		byte[] data = info.getEncryptedData();
-		byte[] out = new byte[cipher.getOutputSize(data.length)];
-		int len = cipher.processBytes(data, 0, data.length, out, 0);
-
-		len += cipher.doFinal(out, len);
-
-		ASN1InputStream asn1Out = new ASN1InputStream(out);
-
-		PrivateKeyInfo keyInfo = new PrivateKeyInfo(
-				(ASN1Sequence) asn1Out.readObject());
-
-		return KeyFactory.getInstance(
-				keyInfo.getAlgorithmId().getAlgorithm().getId(), "BC")
-				.generatePrivate(new PKCS8EncodedKeySpec(keyInfo.getEncoded()));
+	private PrivateKey buildPrivateKey(InputStream keyStream, final String password) throws Exception {
+		PKCS8Key key = new PKCS8Key(keyStream, password.toCharArray());
+		return key.getPrivateKey();
 	}
 	
 }
