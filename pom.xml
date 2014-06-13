@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.lucasian.crypt</groupId>
 	<artifactId>signer</artifactId>
@@ -27,6 +26,21 @@
 		</dependency>
 	</dependencies>
 
+	<scm>
+	  <connection>scm:git:https://github.com/Lucasian/Signer.git</connection>
+	  <developerConnection>scm:git:git@github.com:Lucasian/Signer.git</developerConnection>
+	  <url>https://github.com/Lucasian/Signer</url>
+	  <tag>signer-0.0.1</tag>
+  </scm>
+
+	<distributionManagement>
+		<repository>
+			<id>bintray-gerardo-dr-maven-com.lucasian.crypt.signer</id>
+			<name>gerardo-dr-maven-com.lucasian.crypt.signer</name>
+			<url>https://api.bintray.com/maven/gerardo-dr/maven/com.lucasian.crypt.signer</url>
+		</repository>
+	</distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -45,6 +59,18 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+			</plugin>
+			<plugin>
+			      <artifactId>maven-release-plugin</artifactId>
+			      <version>2.4.1</version>
+			      <configuration>
+				      <useReleaseProfile>false</useReleaseProfile>
+				      <releaseProfiles>release</releaseProfiles>
+				      <autoVersionSubmodules>true</autoVersionSubmodules>
+				        <checkModificationExcludes>
+				            <checkModificationExclude>pom.xml</checkModificationExclude>
+				        </checkModificationExcludes>
+			      </configuration>
 			</plugin>
 		</plugins>
 	</build>
