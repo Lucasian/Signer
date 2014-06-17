@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.lucasian.crypt</groupId>
 	<artifactId>signer</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<name>Signer</name>
 	<description>Sign Encription</description>
 	<packaging>pom</packaging>
@@ -30,7 +30,7 @@
 	  <connection>scm:git:https://github.com/Lucasian/Signer.git</connection>
 	  <developerConnection>scm:git:git@github.com:Lucasian/Signer.git</developerConnection>
 	  <url>https://github.com/Lucasian/Signer</url>
-	  <tag>HEAD</tag>
+	  <tag>signer-0.0.2</tag>
   </scm>
 
 	<distributionManagement>
