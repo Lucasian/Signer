@@ -1,5 +1,5 @@
 Lucasian Signer
 ===============
 
-Lucasian implementacion for signing with nice keys
+Lucasian implementation for signing with nice keys
 
